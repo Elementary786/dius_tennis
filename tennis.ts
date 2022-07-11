@@ -15,10 +15,10 @@ interface DiUSTennis<P1, P2> {
 
 // helper functions for scoring conditions
 const winByTwo = (a: number, b: number) => (a - b) >= 2;
-const atLeastFour = (a: number) => a >= 4;
 const deuce = (a: number, b: number) => a >= 3 && b >= 3 && a === b;
 const advantage = (a: number, b: number) => a >= 3 && b >= 3 && a > b;
-const wonGame = (a: number, b: number) => atLeastFour(a) && winByTwo(a, b);
+const wonGame = (a: number, b: number) => a >= 4 && winByTwo(a, b);
+const wonTiebreak = (a: number, b: number) => a >= 7 && winByTwo(a, b)
 const wonSet = (a: number, b: number) => a >= 6 && winByTwo(a, b);
 
 class Match<P1 extends PlayerName, P2 extends PlayerName> implements DiUSTennis<P1, P2> {
@@ -34,20 +34,36 @@ class Match<P1 extends PlayerName, P2 extends PlayerName> implements DiUSTennis<
 		const p1 = this.player1.points;
 		const p2 = this.player2.points;
 
-		// check game winning conditions
-		if (wonGame(p1, p2)) {
-			this.player1.games += 1;
-			this.resetScore();
-		} else if (wonGame(p2, p1)) {
-			this.player2.games += 1;
-			this.resetScore();
-		}
+		const tiebreak = this.player1.games === 6 && this.player2.games === 6;
 
-		// check set winning conditions
-		if (wonSet(p1, p2)) {
-			this.player1.sets += 1; // congratulations player 1
-		} else if (wonSet(p2, p1)) {
-			this.player2.sets += 1; // congratulations player 2
+		if (tiebreak) {
+			if (wonTiebreak(p1, p2)) {
+				this.player1.sets += 1;
+				this.resetScore();
+				console.log(`congratulations on winning the set, ${this.player1Name}`);
+				// we would reset games to 0 here too but it's not part of the brief.
+			} else if (wonTiebreak(p2, p1)) {
+				this.player2.sets += 1;
+				this.resetScore();
+				console.log(`congratulations on winning the set, ${this.player2Name}`);
+			}
+		} else { // check regular game winning conditions
+			if (wonGame(p1, p2)) {
+				this.player1.games += 1;
+				this.resetScore();
+			} else if (wonGame(p2, p1)) {
+				this.player2.games += 1;
+				this.resetScore();
+			}
+
+			// check set winning conditions
+			if (wonSet(p1, p2)) {
+				this.player1.sets += 1;
+				console.log(`congratulations on winning the set, ${this.player1Name}`);
+			} else if (wonSet(p2, p1)) {
+				this.player2.sets += 1;
+				console.log(`congratulations on winning the set, ${this.player2Name}`);
+			}
 		}
 	}
 
@@ -109,3 +125,36 @@ console.log(match.score());
 match.pointWonBy('player 1');
 // this will return "1-0"
 console.log(match.score());
+
+
+console.log('--------- tiebreak match');
+// play to a tiebreak (6 games for each player of 4 points = 6 * 2 * 4)
+const tiebreakMatch = new Match('Josh', 'James');
+for (let games = 0; games < 12; games++) {
+	if (games % 2 === 0) {
+		tiebreakMatch.pointWonBy('Josh');
+		tiebreakMatch.pointWonBy('Josh');
+		tiebreakMatch.pointWonBy('Josh');
+		tiebreakMatch.pointWonBy('Josh');
+	} else {
+		tiebreakMatch.pointWonBy('James');
+		tiebreakMatch.pointWonBy('James');
+		tiebreakMatch.pointWonBy('James');
+		tiebreakMatch.pointWonBy('James');
+	}
+	console.log(tiebreakMatch.score());
+}
+console.log(tiebreakMatch.score());
+// Now we get to the fun stuff. Let's take it to 6-6 and then I'll win by two :)
+for (let p = 0; p < 12; p++) {
+	if (p % 2 === 0) {
+		tiebreakMatch.pointWonBy('Josh');
+	} else {
+		tiebreakMatch.pointWonBy('James');
+	}
+}
+
+tiebreakMatch.pointWonBy('Josh');
+tiebreakMatch.pointWonBy('Josh');
+
+// expecting to see a congratulatory message here
