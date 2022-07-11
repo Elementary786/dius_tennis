@@ -1,0 +1,14 @@
+{
+  "name": "dius_tennis",
+  "main": "tennis.js",
+  "scripts": {
+    "start": "tsc tennis.ts && node tennis.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Elementary786/dius_tennis.git"
+  },
+  "dependencies": {
+    "typescript": "^4.7.4"
+  }
+}
