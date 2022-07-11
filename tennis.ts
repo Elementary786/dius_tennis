@@ -52,7 +52,23 @@ class Match<P1 extends PlayerName, P2 extends PlayerName> implements DiUSTennis<
 	}
 
 	score(): string {
-		return `${this.player1.games}-${this.player2.games}, ${this.player1.points}-${this.player2.points}`;
+		return `${this.player1.games}-${this.player2.games}, ${this.currentGameScore()}`;
+	}
+
+	private currentGameScore(): string {
+		const p1 = this.player1.points; // brevity
+		const p2 = this.player2.points;
+
+		if (deuce(p1, p2)) return `Deuce`;
+		if (advantage(p1, p2)) return `Advantage ${this.player1Name}`;
+		if (advantage(p2, p1)) return `Advantage ${this.player2Name}`;
+
+		return `${this.getPrettyPointName(p1)}-${this.getPrettyPointName(p2)}`
+	}
+
+	private getPrettyPointName(p: number): string {
+		const POINTS = ['0', '15', '30', '45'];
+		return POINTS[p];
 	}
 
 	private resetScore(): void {
