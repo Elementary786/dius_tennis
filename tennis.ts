@@ -75,6 +75,9 @@ class Match<P1 extends PlayerName, P2 extends PlayerName> implements DiUSTennis<
 		const p1 = this.player1.points; // brevity
 		const p2 = this.player2.points;
 
+		const tiebreak = this.player1.games === 6 && this.player2.games === 6;
+		if (tiebreak) return `${p1}-${p2}`;
+
 		if (deuce(p1, p2)) return `Deuce`;
 		if (advantage(p1, p2)) return `Advantage ${this.player1Name}`;
 		if (advantage(p2, p1)) return `Advantage ${this.player2Name}`;
@@ -83,7 +86,7 @@ class Match<P1 extends PlayerName, P2 extends PlayerName> implements DiUSTennis<
 	}
 
 	private getPrettyPointName(p: number): string {
-		const POINTS = ['0', '15', '30', '45'];
+		const POINTS = ['0', '15', '30', '40'];
 		return POINTS[p];
 	}
 
@@ -128,7 +131,7 @@ console.log(match.score());
 
 
 console.log('--------- tiebreak match');
-// play to a tiebreak (6 games for each player of 4 points = 6 * 2 * 4)
+// play to a tiebreak (6 games for each player of 4 points (love game) = 6 * 2 * 4)
 const tiebreakMatch = new Match('Josh', 'James');
 for (let games = 0; games < 12; games++) {
 	if (games % 2 === 0) {
@@ -142,7 +145,6 @@ for (let games = 0; games < 12; games++) {
 		tiebreakMatch.pointWonBy('James');
 		tiebreakMatch.pointWonBy('James');
 	}
-	console.log(tiebreakMatch.score());
 }
 console.log(tiebreakMatch.score());
 // Now we get to the fun stuff. Let's take it to 6-6 and then I'll win by two :)
@@ -152,9 +154,11 @@ for (let p = 0; p < 12; p++) {
 	} else {
 		tiebreakMatch.pointWonBy('James');
 	}
+	console.log(tiebreakMatch.score());
 }
 
 tiebreakMatch.pointWonBy('Josh');
+console.log(tiebreakMatch.score());
 tiebreakMatch.pointWonBy('Josh');
 
 // expecting to see a congratulatory message here
